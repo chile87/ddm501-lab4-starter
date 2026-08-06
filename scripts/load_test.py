@@ -87,7 +87,7 @@ def check_health() -> bool:
     try:
         response = requests.get(f"{API_URL}/health", timeout=5)
         return response.status_code == 200
-    except:
+    except requests.RequestException:
         return False
 
 
@@ -119,48 +119,34 @@ def run_load_test(duration: int = 60, workers: int = 10, batch_mode: bool = Fals
     print(f"Mode: {'Batch' if batch_mode else 'Single'}")
     print("=" * 60)
     
-    # TODO: Check API health
-    # if not check_health():
-    #     print("ERROR: API is not healthy. Aborting load test.")
-    #     return
-    
-    # TODO: Initialize counters
-    # total_requests = 0
-    # successful = 0
-    # latencies = []
-    
-    # TODO: Run load test using ThreadPoolExecutor
-    # start_time = time.time()
-    # 
-    # with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-    #     while time.time() - start_time < duration:
-    #         # Submit tasks
-    #         if batch_mode:
-    #             futures = [executor.submit(make_batch_prediction) for _ in range(workers)]
-    #         else:
-    #             futures = [executor.submit(make_single_prediction) for _ in range(workers)]
-    #         
-    #         # Collect results
-    #         for future in concurrent.futures.as_completed(futures):
-    #             success, latency = future.result()
-    #             total_requests += 1
-    #             if success:
-    #                 successful += 1
-    #             latencies.append(latency)
-    #         
-    #         # Progress update
-    #         elapsed = time.time() - start_time
-    #         if int(elapsed) % 10 == 0:
-    #             print(f"  Progress: {int(elapsed)}s - {total_requests} requests")
-    #         
-    #         # Small delay to control rate
-    #         time.sleep(0.1)
-    
-    # TODO: Print statistics
-    # print_statistics(total_requests, successful, latencies, duration)
-    
-    print("\nTODO: Implement load test logic")
-    print("See the comments above for implementation guidance")
+    if duration <= 0 or workers <= 0:
+        raise ValueError("duration and workers must be positive")
+    if not check_health():
+        print("ERROR: API is not healthy. Aborting load test.")
+        return
+
+    total_requests = 0
+    successful = 0
+    latencies = []
+    start_time = time.time()
+    next_progress = 10
+    request_fn = make_batch_prediction if batch_mode else make_single_prediction
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+        while time.time() - start_time < duration:
+            futures = [executor.submit(request_fn) for _ in range(workers)]
+            for future in concurrent.futures.as_completed(futures):
+                success, latency = future.result()
+                total_requests += 1
+                successful += int(success)
+                latencies.append(latency)
+            elapsed = time.time() - start_time
+            if elapsed >= next_progress:
+                print(f"  Progress: {int(elapsed)}s - {total_requests} requests")
+                next_progress += 10
+            time.sleep(0.1)
+
+    print_statistics(total_requests, successful, latencies, max(duration, 1))
 
 
 def print_statistics(total: int, successful: int, latencies: list, duration: int):

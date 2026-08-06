@@ -86,27 +86,51 @@ docker-compose up -d
 | Prometheus | http://localhost:9090 | - |
 | Grafana | http://localhost:3000 | admin/admin |
 
-## TODO Tasks
+## Implementation Status
 
 Complete the following files:
 
 ### Metrics Implementation
-- [ ] `app/metrics.py` - Define Prometheus metrics
-- [ ] `app/middleware.py` - Implement metrics middleware
-- [ ] Update `app/model.py` - Add ML metrics instrumentation
+- [x] `app/metrics.py` - Define Prometheus metrics
+- [x] `app/middleware.py` - Implement metrics middleware
+- [x] Update `app/model.py` - Add ML metrics instrumentation
 
 ### Prometheus Configuration
-- [ ] `prometheus/prometheus.yml` - Configure scrape targets
-- [ ] `prometheus/alerts/api_alerts.yml` - API alerting rules
-- [ ] `prometheus/alerts/ml_alerts.yml` - ML-specific alerts
+- [x] `prometheus/prometheus.yml` - Configure scrape targets
+- [x] `prometheus/alerts/api_alerts.yml` - API alerting rules
+- [x] `prometheus/alerts/ml_alerts.yml` - ML-specific alerts
 
 ### Grafana Dashboards
-- [ ] `grafana/dashboards/system_dashboard.json` - System metrics dashboard
-- [ ] `grafana/dashboards/ml_dashboard.json` - ML metrics dashboard
+- [x] `grafana/dashboards/system_dashboard.json` - System metrics dashboard
+- [x] `grafana/dashboards/ml_dashboard.json` - ML metrics dashboard
 
 ### Infrastructure
-- [ ] `docker-compose.yml` - Add Prometheus and Grafana services
-- [ ] `scripts/load_test.py` - Implement load testing
+- [x] `docker-compose.yml` - Add Prometheus and Grafana services
+- [x] `scripts/load_test.py` - Implement load testing
+
+## Dashboard Guide
+
+The System Metrics Dashboard tracks request rate, P95 request latency, HTTP error rate,
+status-code distribution, and traffic by endpoint. The ML Metrics Dashboard tracks model
+availability, prediction rate, P95 prediction latency, prediction value distribution,
+average prediction, prediction errors, and model metadata.
+
+The dashboards use the provisioned Prometheus datasource and are loaded automatically by
+Grafana. Main queries include `rate(http_requests_total[5m])`,
+`histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))`,
+`rate(ml_predictions_total[5m])`, and
+`histogram_quantile(0.95, rate(ml_prediction_duration_seconds_bucket[5m]))`.
+
+## Load Test
+
+```bash
+python scripts/load_test.py --duration 60 --workers 10
+python scripts/load_test.py --duration 60 --workers 10 --batch
+```
+
+The script checks API health and reports totals, success rate, throughput, and P50/P95/P99
+latency. Use this traffic to capture Grafana screenshots. See `rubric-checklist.md` for
+the complete Lab 4 verification and submission checklist.
 
 ## Metrics to Implement
 
