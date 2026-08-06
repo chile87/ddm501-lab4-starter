@@ -33,17 +33,14 @@ groups:
       # Trigger when P95 latency exceeds 1 second for 5 minutes
       # Severity: warning
       
-      # - alert: HighLatency
-      #   expr: |
-      #     histogram_quantile(0.95, 
-      #       rate(http_request_duration_seconds_bucket[5m])
-      #     ) > 1
-      #   for: 5m
-      #   labels:
-      #     severity: warning
-      #   annotations:
-      #     summary: "High latency detected"
-      #     description: "P95 latency is {{ $value }}s (threshold: 1s)"
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High latency detected"
+          description: "P95 latency is {{ $value }}s (threshold: 1s)"
       
       # ========================================================================
       # TODO 3: Service Down Alert
@@ -51,14 +48,14 @@ groups:
       # Trigger when the API service is unreachable
       # Severity: critical
       
-      # - alert: ServiceDown
-      #   expr: up{job="movie-rating-api"} == 0
-      #   for: 1m
-      #   labels:
-      #     severity: critical
-      #   annotations:
-      #     summary: "Movie Rating API is down"
-      #     description: "The API service has been unreachable for more than 1 minute"
+      - alert: ServiceDown
+        expr: up{job="movie-rating-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Movie Rating API is down"
+          description: "The API service has been unreachable for more than 1 minute"
       
       # ========================================================================
       # TODO 4: High Request Rate Alert (BONUS)
@@ -83,11 +80,11 @@ groups:
       # Could indicate service issues or upstream problems
       # Severity: warning
       
-      # - alert: LowRequestRate
-      #   expr: rate(http_requests_total[5m]) < 0.1
-      #   for: 10m
-      #   labels:
-      #     severity: warning
-      #   annotations:
-      #     summary: "Unusually low request rate"
-      #     description: "Request rate is {{ $value }} req/s, expected higher traffic"
+      - alert: LowRequestRate
+        expr: rate(http_requests_total[5m]) < 0.1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Unusually low request rate"
+          description: "Request rate is {{ $value }} req/s, expected higher traffic"
