@@ -177,20 +177,3 @@ rate(ml_predictions_total[5m])
 # Average prediction value
 histogram_quantile(0.5, rate(ml_prediction_value_bucket[5m]))
 ```
-
-## Grading Rubric
-
-| Criteria | Weight |
-|----------|--------|
-| Application Metrics | 25% |
-| Monitoring Stack | 25% |
-| Dashboards & Alerts | 30% |
-| Documentation | 20% |
-
-## Submission
-
-1. Complete all TODO items
-2. Take screenshots of Grafana dashboards with data
-3. Run load test and capture metrics
-4. Push to GitHub
-5. Submit repository link
