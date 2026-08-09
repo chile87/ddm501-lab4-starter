@@ -1,8 +1,75 @@
-# Lab 4: Monitoring & Production Deployment
+# DDM501 Lab 4 - Monitoring & Production Deployment (Group 4)
+
+## General Information
+
+**Lecturer**: Huynh Cong Viet Ngu  
+**Group**: Group 4
+
+| Full Name | MSSV | Role |
+| --- | --- | --- |
+| Le Thi Kim Chi | 25MS23290 | Team lead |
+| Truong Quoc Khanh | 25MS23285 | Member |
+| Truong Sy Quang | 25MS23286 | Member |
+| Nguyen Viet Anh Minh | 25MS23275 | Member |
+
+---
 
 ## Overview
 
-Implement comprehensive monitoring and observability for the movie rating prediction system using Prometheus for metrics collection and Grafana for visualization.
+This lab implements an end-to-end monitoring stack for the movie rating prediction API:
+
+- Application and ML metrics instrumentation
+- Prometheus scraping and alerting rules
+- Grafana dashboards (System + ML)
+- Load testing for observability validation
+
+## Deliverables Coverage
+
+### 1. Instrumented Application
+
+- Exposed metrics endpoint: `/metrics`
+- HTTP metrics: `http_requests_total`, `http_request_duration_seconds`
+- ML metrics: `ml_predictions_total`, `ml_prediction_duration_seconds`, `ml_prediction_value`, `ml_prediction_errors_total`, `ml_model_loaded`
+- Health and prediction endpoints available: `/health`, `/predict`, `/predict/batch`
+
+### 2. Prometheus Setup
+
+- Scrape config implemented for API target `api:8000`
+- Alert rules loaded from `prometheus/alerts/*.yml`
+- Prometheus runs in Docker with persistent volume
+
+### 3. Grafana Dashboards
+
+- Dashboard 1: `System Metrics Dashboard`
+- Dashboard 2: `ML Metrics Dashboard`
+- Provisioned data source and dashboard auto-loading enabled
+
+### 4. Alert Rules
+
+Implemented alerts (>= 5 required):
+
+1. `HighErrorRate`
+2. `HighLatency`
+3. `ServiceDown`
+4. `ModelNotLoaded`
+5. `PredictionLatencyHigh`
+6. `LowPredictionVolume`
+
+### 5 Load Test Results
+
+- Load test script: `scripts/load_test.py`
+- Supports single and batch prediction traffic
+- Reports total requests, success rate, throughput, and latency percentiles (P50/P95/P99)
+- Screenshot evidence should be saved in `screenshots/`
+
+### 6. Documentation
+
+This README provides:
+
+- Setup instructions
+- Monitoring stack runbook
+- Dashboard guide
+- Load-test verification workflow
 
 ## Project Structure
 
@@ -14,13 +81,13 @@ ddm501-lab4-starter/
 │   ├── model.py            # ML model with instrumentation
 │   ├── schemas.py          # Pydantic schemas
 │   ├── config.py           # Configuration
-│   ├── metrics.py          # Prometheus metrics (TODO)
-│   └── middleware.py       # Metrics middleware (TODO)
+│   ├── metrics.py          # Prometheus metrics
+│   └── middleware.py       # Metrics middleware
 ├── prometheus/
-│   ├── prometheus.yml      # Prometheus config (TODO)
+│   ├── prometheus.yml      # Prometheus config
 │   └── alerts/
-│       ├── api_alerts.yml  # API alerting rules (TODO)
-│       └── ml_alerts.yml   # ML alerting rules (TODO)
+│       ├── api_alerts.yml  # API alerting rules
+│       └── ml_alerts.yml   # ML alerting rules
 ├── grafana/
 │   ├── provisioning/
 │   │   ├── datasources/
@@ -28,43 +95,44 @@ ddm501-lab4-starter/
 │   │   └── dashboards/
 │   │       └── dashboards.yml  # Dashboard provisioning
 │   └── dashboards/
-│       ├── system_dashboard.json   # System metrics (TODO)
-│       └── ml_dashboard.json       # ML metrics (TODO)
+│       ├── system_dashboard.json   # System metrics
+│       └── ml_dashboard.json       # ML metrics
 ├── scripts/
 │   ├── train_model.py      # Model training
-│   └── load_test.py        # Load testing script (TODO)
+│   └── load_test.py        # Load testing script
 ├── tests/
 │   └── test_metrics.py     # Metrics tests
 ├── models/                 # Saved models
-├── docker-compose.yml      # Full stack deployment (TODO)
+├── docker-compose.yml      # Full stack deployment
 ├── Dockerfile
 ├── requirements.txt
 └── README.md
 ```
 
-## Quick Start
+## Implementation Guide
 
-### 1. Clone and Setup
+### 1. Clone and set up the environment
 
 ```bash
-unzip ddm501-lab4-starter.zip
 cd ddm501-lab4-starter
 
 # Create virtual environment
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
+source venv/bin/activate       # macOS / Linux
+# venv\Scripts\activate        # Windows
 
 # Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Train Model (if not exists)
+### 2. Prepare & Train the Model (If not exist)
 
 ```bash
 python scripts/train_model.py
 ```
 
 ### 3. Run API Locally
+Run FastAPI development server:
 
 ```bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
@@ -73,40 +141,20 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ### 4. Start Full Monitoring Stack
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 5. Access Services
 
-| Service | URL | Credentials |
-|---------|-----|-------------|
-| API | http://localhost:8000 | - |
-| API Docs | http://localhost:8000/docs | - |
-| Metrics | http://localhost:8000/metrics | - |
-| Prometheus | http://localhost:9090 | - |
-| Grafana | http://localhost:3000 | admin/admin |
+| Service | URL | Credentials | Screenshot |
+|---------|-----|-------------|-------------|
+| API | http://localhost:8000 | - ||
+| API Docs | http://localhost:8000/docs | - |-------------|
+| Metrics | http://localhost:8000/metrics | - |-------------|
+| Prometheus | http://localhost:9090 | - |-------------|
+| Grafana | http://localhost:3000 | admin/admin |-------------|
 
 ## Implementation Status
-
-Complete the following files:
-
-### Metrics Implementation
-- [x] `app/metrics.py` - Define Prometheus metrics
-- [x] `app/middleware.py` - Implement metrics middleware
-- [x] Update `app/model.py` - Add ML metrics instrumentation
-
-### Prometheus Configuration
-- [x] `prometheus/prometheus.yml` - Configure scrape targets
-- [x] `prometheus/alerts/api_alerts.yml` - API alerting rules
-- [x] `prometheus/alerts/ml_alerts.yml` - ML-specific alerts
-
-### Grafana Dashboards
-- [x] `grafana/dashboards/system_dashboard.json` - System metrics dashboard
-- [x] `grafana/dashboards/ml_dashboard.json` - ML metrics dashboard
-
-### Infrastructure
-- [x] `docker-compose.yml` - Add Prometheus and Grafana services
-- [x] `scripts/load_test.py` - Implement load testing
 
 ## Dashboard Guide
 
@@ -121,6 +169,8 @@ Grafana. Main queries include `rate(http_requests_total[5m])`,
 `rate(ml_predictions_total[5m])`, and
 `histogram_quantile(0.95, rate(ml_prediction_duration_seconds_bucket[5m]))`.
 
+![Image](screenshots/grafana-ml-dashboard.png)
+![Image](screenshots/grafana-system-dashboard.png)
 ## Load Test
 
 ```bash
@@ -129,8 +179,7 @@ python scripts/load_test.py --duration 60 --workers 10 --batch
 ```
 
 The script checks API health and reports totals, success rate, throughput, and P50/P95/P99
-latency. Use this traffic to capture Grafana screenshots. See `rubric-checklist.md` for
-the complete Lab 4 verification and submission checklist.
+latency. Use this traffic to capture Grafana screenshots. 
 
 ## Metrics to Implement
 
