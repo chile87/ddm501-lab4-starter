@@ -23,54 +23,6 @@ This lab implements an end-to-end monitoring stack for the movie rating predicti
 - Grafana dashboards (System + ML)
 - Load testing for observability validation
 
-## Deliverables Coverage
-
-### 1. Instrumented Application
-
-- Exposed metrics endpoint: `/metrics`
-- HTTP metrics: `http_requests_total`, `http_request_duration_seconds`
-- ML metrics: `ml_predictions_total`, `ml_prediction_duration_seconds`, `ml_prediction_value`, `ml_prediction_errors_total`, `ml_model_loaded`
-- Health and prediction endpoints available: `/health`, `/predict`, `/predict/batch`
-
-### 2. Prometheus Setup
-
-- Scrape config implemented for API target `api:8000`
-- Alert rules loaded from `prometheus/alerts/*.yml`
-- Prometheus runs in Docker with persistent volume
-
-### 3. Grafana Dashboards
-
-- Dashboard 1: `System Metrics Dashboard`
-- Dashboard 2: `ML Metrics Dashboard`
-- Provisioned data source and dashboard auto-loading enabled
-
-### 4. Alert Rules
-
-Implemented alerts (>= 5 required):
-
-1. `HighErrorRate`
-2. `HighLatency`
-3. `ServiceDown`
-4. `ModelNotLoaded`
-5. `PredictionLatencyHigh`
-6. `LowPredictionVolume`
-
-### 5 Load Test Results
-
-- Load test script: `scripts/load_test.py`
-- Supports single and batch prediction traffic
-- Reports total requests, success rate, throughput, and latency percentiles (P50/P95/P99)
-- Screenshot evidence should be saved in `screenshots/`
-
-### 6. Documentation
-
-This README provides:
-
-- Setup instructions
-- Monitoring stack runbook
-- Dashboard guide
-- Load-test verification workflow
-
 ## Project Structure
 
 ```
@@ -111,6 +63,16 @@ ddm501-lab4-starter/
 
 ## Implementation Guide
 
+## Prerequisites
+
+| Tool | Version |
+|------|---------|
+| Python | 3.10+ |
+| Docker & Docker Compose | 24+ |
+| pip | latest |
+
+---
+
 ### 1. Clone and set up the environment
 
 ```bash
@@ -146,13 +108,13 @@ docker compose up -d
 
 ### 5. Access Services
 
-| Service | URL | Credentials | Screenshot |
-|---------|-----|-------------|-------------|
-| API | http://localhost:8000 | - ||
-| API Docs | http://localhost:8000/docs | - |-------------|
-| Metrics | http://localhost:8000/metrics | - |-------------|
-| Prometheus | http://localhost:9090 | - |-------------|
-| Grafana | http://localhost:3000 | admin/admin |-------------|
+| Service | URL | Credentials | 
+|---------|-----|-------------|
+| API | http://localhost:8000 | - |
+| API Docs | http://localhost:8000/docs | - |
+| Metrics | http://localhost:8000/metrics | - |
+| Prometheus | http://localhost:9090 | - |
+| Grafana | http://localhost:3000 | admin/admin |
 
 ## Implementation Status
 
